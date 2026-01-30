@@ -1,16 +1,17 @@
-[gd_scene load_steps=18 format=3 uid="uid://bce78kbru2i5w"]
+[gd_scene load_steps=19 format=3 uid="uid://bce78kbru2i5w"]
 
-[ext_resource type="Script" uid="uid://cvg5y1yjmoojj" path="res://scripts/characters/player/Player.cs" id="1_6avc5"]
+[ext_resource type="Script" uid="uid://cvg5y1yjmoojj" path="res://scripts/characters/player/PlayerController.cs" id="1_6avc5"]
 [ext_resource type="Texture2D" uid="uid://hy8fh0wp842q" path="res://assets/characters/player/placeholder/dash.png" id="1_qd3e3"]
 [ext_resource type="Texture2D" uid="uid://yjoddd318lxh" path="res://assets/characters/player/placeholder/idle.png" id="2_6avc5"]
 [ext_resource type="Texture2D" uid="uid://cqu2bynh7016m" path="res://assets/characters/player/placeholder/run1.png" id="3_mk55u"]
+[ext_resource type="Texture2D" uid="uid://cr2cwq2uxmyg4" path="res://assets/characters/player/placeholder/jump.png" id="4_blysn"]
 [ext_resource type="Texture2D" uid="uid://3cewkhg1xtal" path="res://assets/characters/player/placeholder/run.png" id="4_xuses"]
 [ext_resource type="Texture2D" uid="uid://b3r3lf055jvbe" path="res://assets/characters/player/placeholder/slide.png" id="5_42irl"]
 [ext_resource type="Script" uid="uid://c7anrc8jfpnjw" path="res://scripts/characters/player/StateMachine.cs" id="7_mk55u"]
 [ext_resource type="Script" uid="uid://sjkcsxerh07x" path="res://scripts/characters/player/states/RunState.cs" id="8_42irl"]
 [ext_resource type="Script" uid="uid://bjjpak6kkkixf" path="res://scripts/characters/player/states/IdleState.cs" id="9_3xnwo"]
 [ext_resource type="Script" uid="uid://bnd3sphbyc8sx" path="res://scripts/characters/player/states/JumpState.cs" id="10_3xnwo"]
-[ext_resource type="Script" uid="uid://djta7clexv31v" path="res://scripts/characters/player/states/DashState.cs" id="11_djydg"]
+[ext_resource type="Script" uid="uid://djta7clexv31v" path="res://scripts/characters/player/states/DashAttackState.cs" id="11_djydg"]
 [ext_resource type="Script" uid="uid://7j8udyol12xg" path="res://scripts/characters/player/states/SlideState.cs" id="12_bsn6e"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_3xnwo"]
@@ -25,13 +26,24 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
+"texture": ExtResource("4_blysn")
+}],
+"loop": true,
+"name": &"fall",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
 "texture": ExtResource("2_6avc5")
 }],
 "loop": true,
 "name": &"idle",
 "speed": 5.0
 }, {
-"frames": [],
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_blysn")
+}],
 "loop": true,
 "name": &"jump",
 "speed": 5.0
@@ -68,12 +80,23 @@ size = Vector2(40, 20)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_mk55u"]
 size = Vector2(27, 12)
 
-[node name="player" type="CharacterBody2D"]
+[node name="player" type="CharacterBody2D" node_paths=PackedStringArray("AnimatedSprite", "DashHitbox", "SlideHitbox", "HurtboxCollision")]
+collision_layer = 2
+collision_mask = 17
+platform_floor_layers = 4294967041
 script = ExtResource("1_6avc5")
+MaxJumps = 0
+DashSpeed = 300.0
+DashDuration = 0.1
+SlideDuration = 1.0
+AnimatedSprite = NodePath("AnimatedSprite2D")
+DashHitbox = NodePath("DashHitbox")
+SlideHitbox = NodePath("SlideHitbox")
+HurtboxCollision = NodePath("Hurtbox/CollisionShape2D")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_3xnwo")
-animation = &"slide"
+animation = &"fall"
 autoplay = "idle"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
@@ -81,6 +104,8 @@ position = Vector2(-1, 5)
 shape = SubResource("RectangleShape2D_djydg")
 
 [node name="Hurtbox" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 16
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
 position = Vector2(-1, 3.5)
@@ -88,6 +113,8 @@ shape = SubResource("RectangleShape2D_qd3e3")
 debug_color = Color(0.9642144, 0.14822191, 0.31210807, 0.41960785)
 
 [node name="DashHitbox" type="Area2D" parent="."]
+collision_layer = 8
+collision_mask = 20
 monitoring = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DashHitbox"]
@@ -97,6 +124,8 @@ debug_color = Color(0.80271345, 0.21854407, 0.8749951, 0.41960785)
 
 [node name="SlideHitbox" type="Area2D" parent="."]
 position = Vector2(0, -3)
+collision_layer = 8
+collision_mask = 20
 monitoring = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="SlideHitbox"]
@@ -104,8 +133,9 @@ position = Vector2(-4, 11)
 shape = SubResource("RectangleShape2D_mk55u")
 debug_color = Color(0.6785865, 0.50501186, 0, 0.41960785)
 
-[node name="StateMachine" type="Node" parent="."]
+[node name="StateMachine" type="Node" parent="." node_paths=PackedStringArray("InitialState")]
 script = ExtResource("7_mk55u")
+InitialState = NodePath("IdleState")
 
 [node name="RunState" type="Node" parent="StateMachine"]
 script = ExtResource("8_42irl")
@@ -116,7 +146,7 @@ script = ExtResource("9_3xnwo")
 [node name="JumpState" type="Node" parent="StateMachine"]
 script = ExtResource("10_3xnwo")
 
-[node name="DashState" type="Node" parent="StateMachine"]
+[node name="DashAttackState" type="Node" parent="StateMachine"]
 script = ExtResource("11_djydg")
 
 [node name="SlideState" type="Node" parent="StateMachine"]

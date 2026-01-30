@@ -69,6 +69,7 @@ public partial class PlayerController : CharacterBody2D
 	public override void _Ready()
 	{
 		StateMachine = GetNode<StateMachine>("StateMachine");
+		GD.Print("Player Controlled");
 		
 		// Disable hitboxes by default
 		if (DashHitbox != null)
@@ -122,7 +123,7 @@ public partial class PlayerController : CharacterBody2D
 		// Update facing direction
 		if (InputDirection.X != 0)
 		{
-			FacingDirection = InputDirection.X > 0 ? 1 : -1;
+			FacingDirection = InputDirection.X > 0 ? -1 : 1;
 		}
 	}
 	

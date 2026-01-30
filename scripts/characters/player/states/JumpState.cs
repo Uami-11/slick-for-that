@@ -118,7 +118,7 @@ public partial class JumpState : State
 		}
 		
 		// Can still dash attack in air
-		if (Input.IsActionJustPressed("dash_attack") && player.DashCooldownTimer <= 0)
+		if (Input.IsActionJustPressed("dash") && player.DashCooldownTimer <= 0)
 		{
 			player.StateMachine.TransitionTo("DashAttackState");
 		}

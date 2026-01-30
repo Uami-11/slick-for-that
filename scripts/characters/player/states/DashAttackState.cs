@@ -8,7 +8,7 @@ public partial class DashAttackState : State
 	public override void Enter()
 	{
 		if (player.AnimatedSprite != null)
-			player.AnimatedSprite.Play("dash_attack");
+			player.AnimatedSprite.Play("dash");
 		
 		// Start dash timer
 		player.DashTimer = player.DashDuration;
@@ -18,15 +18,12 @@ public partial class DashAttackState : State
 		if (player.DashHitbox != null)
 		{
 			player.DashHitbox.Monitoring = true;
-			// Connect to area_entered signal if not already connected
-			if (!player.DashHitbox.IsConnected("area_entered", new Callable(this, nameof(OnHitboxAreaEntered))))
-			{
-				player.DashHitbox.AreaEntered += OnHitboxAreaEntered;
-			}
-			if (!player.DashHitbox.IsConnected("body_entered", new Callable(this, nameof(OnHitboxBodyEntered))))
-			{
-				player.DashHitbox.BodyEntered += OnHitboxBodyEntered;
-			}
+			// Disconnect first to avoid duplicate connections, then connect
+			player.DashHitbox.AreaEntered -= OnHitboxAreaEntered;
+			player.DashHitbox.AreaEntered += OnHitboxAreaEntered;
+			
+			player.DashHitbox.BodyEntered -= OnHitboxBodyEntered;
+			player.DashHitbox.BodyEntered += OnHitboxBodyEntered;
 		}
 		
 		// Add screen shake or particle effect here
@@ -47,7 +44,7 @@ public partial class DashAttackState : State
 		
 		// Dash forward in facing direction
 		player.Velocity = new Vector2(
-			player.FacingDirection * player.DashSpeed,
+			player.FacingDirection * -1 * player.DashSpeed,
 			0 // No vertical movement during dash
 		);
 		

@@ -1,18 +1,23 @@
 using Godot;
 
 /// <summary>
-/// Player running state
+/// Player idle state - standing still or slight movement
 /// </summary>
-public partial class RunState : State
+public partial class IdleState : State
 {
 	public override void Enter()
 	{
 		if (player.AnimatedSprite != null)
-			player.AnimatedSprite.Play("run");
+			player.AnimatedSprite.Play("idle");
+		
+		GD.Print("Entered Idle State");
 	}
 	
 	public override void PhysicsUpdate(double delta)
 	{
+		// DEBUG: Print input direction every frame
+		GD.Print($"InputDirection: {player.InputDirection}, X: {player.InputDirection.X}");
+		
 		// Apply gravity
 		if (!player.IsOnFloor())
 		{
@@ -22,40 +27,25 @@ public partial class RunState : State
 			);
 		}
 		
-		// Apply horizontal movement
-		if (player.InputDirection.X != 0)
-		{
-			player.Velocity = new Vector2(
-				Mathf.MoveToward(player.Velocity.X, player.InputDirection.X * player.CurrentSpeed, player.Acceleration * (float)delta),
-				player.Velocity.Y
-			);
-			
-			// Flip sprite based on direction
-			if (player.AnimatedSprite != null)
-			{
-				player.AnimatedSprite.FlipH = player.FacingDirection < 0;
-			}
-		}
-		else
-		{
-			// Apply friction if no input
-			player.Velocity = new Vector2(
-				Mathf.MoveToward(player.Velocity.X, 0, player.Friction * (float)delta),
-				player.Velocity.Y
-			);
-		}
+		// Apply friction
+		player.Velocity = new Vector2(
+			Mathf.MoveToward(player.Velocity.X, 0, player.Friction * (float)delta),
+			player.Velocity.Y
+		);
 		
 		player.MoveAndSlide();
 		
 		// Check for state transitions
-		if (player.InputDirection.X == 0 && Mathf.Abs(player.Velocity.X) < 10f)
+		if (player.InputDirection.X != 0)
 		{
-			player.StateMachine.TransitionTo("IdleState");
+			GD.Print("Trying to transition to RunState!");
+			player.StateMachine.TransitionTo("RunState");
 		}
 		
 		// Handle jump input
 		if (Input.IsActionJustPressed("jump"))
 		{
+			GD.Print("Jump pressed!");
 			if (player.TryJump())
 			{
 				player.StateMachine.TransitionTo("JumpState");
@@ -66,13 +56,15 @@ public partial class RunState : State
 			}
 		}
 		
-		if (Input.IsActionJustPressed("dash_attack") && player.DashCooldownTimer <= 0)
+		if (Input.IsActionJustPressed("dash") && player.DashCooldownTimer <= 0)
 		{
+			GD.Print("Dash pressed!");
 			player.StateMachine.TransitionTo("DashAttackState");
 		}
 		
 		if (Input.IsActionJustPressed("slide") && player.SlideCooldownTimer <= 0)
 		{
+			GD.Print("Slide pressed!");
 			player.StateMachine.TransitionTo("SlideState");
 		}
 	}

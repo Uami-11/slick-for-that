@@ -18,15 +18,12 @@ public partial class SlideState : State
 		if (player.SlideHitbox != null)
 		{
 			player.SlideHitbox.Monitoring = true;
-			// Connect to signals if not already connected
-			if (!player.SlideHitbox.IsConnected("area_entered", new Callable(this, nameof(OnHitboxAreaEntered))))
-			{
-				player.SlideHitbox.AreaEntered += OnHitboxAreaEntered;
-			}
-			if (!player.SlideHitbox.IsConnected("body_entered", new Callable(this, nameof(OnHitboxBodyEntered))))
-			{
-				player.SlideHitbox.BodyEntered += OnHitboxBodyEntered;
-			}
+			// Disconnect first to avoid duplicate connections, then connect
+			player.SlideHitbox.AreaEntered -= OnHitboxAreaEntered;
+			player.SlideHitbox.AreaEntered += OnHitboxAreaEntered;
+			
+			player.SlideHitbox.BodyEntered -= OnHitboxBodyEntered;
+			player.SlideHitbox.BodyEntered += OnHitboxBodyEntered;
 		}
 		
 		GD.Print("Sliding!");
@@ -50,7 +47,7 @@ public partial class SlideState : State
 		float currentSlideSpeed = player.SlideSpeed * slideProgress; // Decelerates as slide progresses
 		
 		player.Velocity = new Vector2(
-			player.FacingDirection * currentSlideSpeed,
+			player.FacingDirection * -1 * currentSlideSpeed,
 			player.Velocity.Y + player.Gravity * (float)delta // Still apply gravity
 		);
 		
