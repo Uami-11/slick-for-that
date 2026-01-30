@@ -19,8 +19,8 @@ public partial class PlayerController : CharacterBody2D
 	
 	// Dash Attack
 	[ExportGroup("Dash Attack")]
-	[Export] public float DashSpeed = 500f;
-	[Export] public float DashDuration = 0.3f;
+	[Export] public float DashSpeed = 250f;
+	[Export] public float DashDuration = 0.1f;
 	[Export] public float DashCooldown = 0.5f;
 	
 	// Slide Attack
@@ -68,6 +68,7 @@ public partial class PlayerController : CharacterBody2D
 	
 	public override void _Ready()
 	{
+		AddToGroup("player");
 		StateMachine = GetNode<StateMachine>("StateMachine");
 		GD.Print("Player Controlled");
 		

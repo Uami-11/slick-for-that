@@ -11,12 +11,12 @@ public partial class IdleState : State
 			player.AnimatedSprite.Play("idle");
 		
 		GD.Print("Entered Idle State");
-	}
+	}	
 	
 	public override void PhysicsUpdate(double delta)
 	{
 		// DEBUG: Print input direction every frame
-		GD.Print($"InputDirection: {player.InputDirection}, X: {player.InputDirection.X}");
+		//GD.Print($"InputDirection: {player.InputDirection}, X: {player.InputDirection.X}");
 		
 		// Apply gravity
 		if (!player.IsOnFloor())

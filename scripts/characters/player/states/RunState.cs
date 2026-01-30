@@ -33,7 +33,7 @@ public partial class RunState : State
 			);
 			
 			// DEBUG: Print velocity
-			GD.Print($"Setting velocity to: {player.Velocity}, CurrentSpeed: {player.CurrentSpeed}");
+			//GD.Print($"Setting velocity to: {player.Velocity}, CurrentSpeed: {player.CurrentSpeed}");
 			
 			// Flip sprite based on direction
 			if (player.AnimatedSprite != null)
@@ -55,7 +55,7 @@ public partial class RunState : State
 		player.MoveAndSlide();
 		var posAfter = player.Position;
 		
-		GD.Print($"Position before: {posBefore}, after: {posAfter}, IsOnFloor: {player.IsOnFloor()}");
+		//GD.Print($"Position before: {posBefore}, after: {posAfter}, IsOnFloor: {player.IsOnFloor()}");
 		
 		// Check for state transitions
 		if (player.InputDirection.X == 0 && Mathf.Abs(player.Velocity.X) < 10f)
