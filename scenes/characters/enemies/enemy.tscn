@@ -1,0 +1,97 @@
+[gd_scene load_steps=14 format=3 uid="uid://bi6gudrspshhx"]
+
+[ext_resource type="Script" uid="uid://1ra1fsm4wavp" path="res://scripts/characters/enemies/Enemy.cs" id="1_blu3w"]
+[ext_resource type="Texture2D" uid="uid://df02wglvm7vm2" path="res://assets/characters/enemies/IDLE.png" id="1_w0ky3"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_blu3w"]
+atlas = ExtResource("1_w0ky3")
+region = Rect2(0, 0, 96, 84)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nwhyh"]
+atlas = ExtResource("1_w0ky3")
+region = Rect2(96, 0, 96, 84)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qj54i"]
+atlas = ExtResource("1_w0ky3")
+region = Rect2(192, 0, 96, 84)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ihb4b"]
+atlas = ExtResource("1_w0ky3")
+region = Rect2(288, 0, 96, 84)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ksqmq"]
+atlas = ExtResource("1_w0ky3")
+region = Rect2(384, 0, 96, 84)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8e52f"]
+atlas = ExtResource("1_w0ky3")
+region = Rect2(480, 0, 96, 84)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mxrkf"]
+atlas = ExtResource("1_w0ky3")
+region = Rect2(576, 0, 96, 84)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_jmxl0"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_blu3w")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_nwhyh")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qj54i")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ihb4b")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ksqmq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8e52f")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mxrkf")
+}],
+"loop": true,
+"name": &"default",
+"speed": 12.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_w0ky3"]
+size = Vector2(10, 27)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_blu3w"]
+size = Vector2(36, 35)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_nwhyh"]
+size = Vector2(79, 33)
+
+[node name="enemy" type="CharacterBody2D"]
+script = ExtResource("1_blu3w")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_jmxl0")
+autoplay = "default"
+frame_progress = 0.3751709
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 5.5)
+shape = SubResource("RectangleShape2D_w0ky3")
+
+[node name="Hurtbox" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+position = Vector2(-1, 2.5)
+shape = SubResource("RectangleShape2D_blu3w")
+debug_color = Color(0.8808905, 0.18460971, 0.6999292, 0.41960785)
+
+[node name="AttackHitbox" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AttackHitbox"]
+position = Vector2(0.5, 1.5)
+rotation = 0.0027805855
+shape = SubResource("RectangleShape2D_nwhyh")
+debug_color = Color(0.6217869, 0.5340465, 5.7756904e-07, 0.41960785)

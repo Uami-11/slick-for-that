@@ -1,0 +1,19 @@
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Slick for that", "Slick for that.csproj", "{03BB702D-7F2E-4694-9FD9-16048EB747BC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+	Debug|Any CPU = Debug|Any CPU
+	ExportDebug|Any CPU = ExportDebug|Any CPU
+	ExportRelease|Any CPU = ExportRelease|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{03BB702D-7F2E-4694-9FD9-16048EB747BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03BB702D-7F2E-4694-9FD9-16048EB747BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03BB702D-7F2E-4694-9FD9-16048EB747BC}.ExportDebug|Any CPU.ActiveCfg = ExportDebug|Any CPU
+		{03BB702D-7F2E-4694-9FD9-16048EB747BC}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
+		{03BB702D-7F2E-4694-9FD9-16048EB747BC}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
+		{03BB702D-7F2E-4694-9FD9-16048EB747BC}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
+	EndGlobalSection
+EndGlobal
