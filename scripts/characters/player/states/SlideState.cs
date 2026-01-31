@@ -1,24 +1,30 @@
 using Godot;
 
 /// <summary>
-/// Slide attack state - low sliding attack that damages enemies
+/// Slide attack state - low sliding attack that damages and stuns enemies
+/// Only works when on the ground
 /// </summary>
 public partial class SlideState : State
 {
 	public override void Enter()
 	{
+		// Only allow slide if on floor
+		if (!player.IsOnFloor())
+		{
+			GD.Print("Can't slide in air!");
+			player.StateMachine.TransitionTo("JumpState");
+			return;
+		}
+		
 		if (player.AnimatedSprite != null)
 			player.AnimatedSprite.Play("slide");
 		
-		// Start slide timer
 		player.SlideTimer = player.SlideDuration;
 		player.SlideCooldownTimer = player.SlideCooldown;
 		
-		// Enable slide hitbox
 		if (player.SlideHitbox != null)
 		{
 			player.SlideHitbox.Monitoring = true;
-			// Disconnect first to avoid duplicate connections, then connect
 			player.SlideHitbox.AreaEntered -= OnHitboxAreaEntered;
 			player.SlideHitbox.AreaEntered += OnHitboxAreaEntered;
 			
@@ -31,7 +37,6 @@ public partial class SlideState : State
 	
 	public override void Exit()
 	{
-		// Disable slide hitbox
 		if (player.SlideHitbox != null)
 		{
 			player.SlideHitbox.Monitoring = false;
@@ -42,16 +47,23 @@ public partial class SlideState : State
 	{
 		player.SlideTimer -= (float)delta;
 		
-		// Slide in the facing direction with slight deceleration
+		// Slide in the facing direction with deceleration
 		float slideProgress = player.SlideTimer / player.SlideDuration;
-		float currentSlideSpeed = player.SlideSpeed * slideProgress; // Decelerates as slide progresses
+		float currentSlideSpeed = player.SlideSpeed * slideProgress;
 		
 		player.Velocity = new Vector2(
 			player.FacingDirection * -1 * currentSlideSpeed,
-			player.Velocity.Y + player.Gravity * (float)delta // Still apply gravity
+			player.Velocity.Y + player.Gravity * (float)delta
 		);
 		
 		player.MoveAndSlide();
+		
+		// If we leave the ground during slide, go to jump state
+		if (!player.IsOnFloor())
+		{
+			player.StateMachine.TransitionTo("JumpState");
+			return;
+		}
 		
 		// Return to appropriate state when slide finishes
 		if (player.SlideTimer <= 0)
@@ -69,29 +81,26 @@ public partial class SlideState : State
 	
 	private void OnHitboxAreaEntered(Area2D area)
 	{
-		// Check if it's an enemy hurtbox
 		if (area.IsInGroup("enemy_hurtbox"))
 		{
-			// Deal damage to enemy
 			if (area.Owner is Enemy enemy)
 			{
-				enemy.TakeDamage(player.SlideDamage);
-				GD.Print("Hit enemy with slide attack!");
-				
-				// Add hit effect here
+				enemy.TakeDamage(player.SlideDamage, player.GlobalPosition);
+				enemy.Stun(player.SlideStunDuration);
+				GD.Print("Hit enemy with slide attack! Enemy stunned!");
 			}
 		}
 	}
 	
 	private void OnHitboxBodyEntered(Node2D body)
 	{
-		// Alternative: Check if body is an enemy
 		if (body.IsInGroup("enemy"))
 		{
 			if (body is Enemy enemy)
 			{
-				enemy.TakeDamage(player.SlideDamage);
-				GD.Print("Hit enemy with slide attack!");
+				enemy.TakeDamage(player.SlideDamage, player.GlobalPosition);
+				enemy.Stun(player.SlideStunDuration);
+				GD.Print("Hit enemy with slide attack! Enemy stunned!");
 			}
 		}
 	}

@@ -2,36 +2,35 @@ using Godot;
 
 /// <summary>
 /// Dash attack state - King's Scepter style forward dash with hitbox
+/// Bounces upward when hitting an enemy
 /// </summary>
 public partial class DashAttackState : State
 {
+	private bool hasHitEnemy = false;
+	
 	public override void Enter()
 	{
+		hasHitEnemy = false;
+		
 		if (player.AnimatedSprite != null)
 			player.AnimatedSprite.Play("dash");
 		
-		// Start dash timer
 		player.DashTimer = player.DashDuration;
 		player.DashCooldownTimer = player.DashCooldown;
 		
-		// Enable dash hitbox
 		if (player.DashHitbox != null)
 		{
 			player.DashHitbox.Monitoring = true;
-			// Disconnect first to avoid duplicate connections, then connect
 			player.DashHitbox.AreaEntered -= OnHitboxAreaEntered;
 			player.DashHitbox.AreaEntered += OnHitboxAreaEntered;
 			
 			player.DashHitbox.BodyEntered -= OnHitboxBodyEntered;
 			player.DashHitbox.BodyEntered += OnHitboxBodyEntered;
 		}
-		
-		// Add screen shake or particle effect here
 	}
 	
 	public override void Exit()
 	{
-		// Disable dash hitbox
 		if (player.DashHitbox != null)
 		{
 			player.DashHitbox.Monitoring = false;
@@ -45,51 +44,91 @@ public partial class DashAttackState : State
 		// Dash forward in facing direction
 		player.Velocity = new Vector2(
 			player.FacingDirection * -1 * player.DashSpeed,
-			0 // No vertical movement during dash
+			player.Velocity.Y // Keep Y velocity for bounce
 		);
 		
+		// Apply gravity
+		if (!hasHitEnemy)
+		{
+			player.Velocity = new Vector2(
+				player.Velocity.X,
+				player.Velocity.Y + player.Gravity * (float)delta
+			);
+		}
+		
 		player.MoveAndSlide();
+		
+		// If hit enemy, transition to jump state to handle air control
+		if (hasHitEnemy)
+		{
+			player.StateMachine.TransitionTo("JumpState");
+			return;
+		}
 		
 		// Return to idle/run when dash finishes
 		if (player.DashTimer <= 0)
 		{
-			if (player.InputDirection.X != 0)
+			if (player.IsOnFloor())
 			{
-				player.StateMachine.TransitionTo("RunState");
+				if (player.InputDirection.X != 0)
+				{
+					player.StateMachine.TransitionTo("RunState");
+				}
+				else
+				{
+					player.StateMachine.TransitionTo("IdleState");
+				}
 			}
 			else
 			{
-				player.StateMachine.TransitionTo("IdleState");
+				player.StateMachine.TransitionTo("JumpState");
 			}
 		}
 	}
 	
 	private void OnHitboxAreaEntered(Area2D area)
 	{
-		// Check if it's an enemy hurtbox
 		if (area.IsInGroup("enemy_hurtbox"))
 		{
-			// Deal damage to enemy
 			if (area.Owner is Enemy enemy)
 			{
-				enemy.TakeDamage(1);
+				enemy.TakeDamage(1, player.GlobalPosition);
 				GD.Print("Hit enemy with dash attack!");
 				
+				// Bounce player upward
+				player.OnDashHitEnemy();
+				hasHitEnemy = true;
+				
 				// Add hit effect, freeze frame, etc.
+				HitFreeze();
 			}
 		}
 	}
 	
 	private void OnHitboxBodyEntered(Node2D body)
 	{
-		// Alternative: Check if body is an enemy
 		if (body.IsInGroup("enemy"))
 		{
 			if (body is Enemy enemy)
 			{
-				enemy.TakeDamage(1);
+				enemy.TakeDamage(1, player.GlobalPosition);
 				GD.Print("Hit enemy with dash attack!");
+				
+				player.OnDashHitEnemy();
+				hasHitEnemy = true;
+				
+				HitFreeze();
 			}
 		}
+	}
+	
+	private void HitFreeze()
+	{
+		// Brief freeze frame for impact
+		Engine.TimeScale = 0.1f;
+		player.GetTree().CreateTimer(0.05f, true, false, true).Timeout += () =>
+		{
+			Engine.TimeScale = 1.0f;
+		};
 	}
 }

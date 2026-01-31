@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://bce78kbru2i5w"]
+[gd_scene load_steps=20 format=3 uid="uid://bce78kbru2i5w"]
 
 [ext_resource type="Script" uid="uid://cvg5y1yjmoojj" path="res://scripts/characters/player/PlayerController.cs" id="1_6avc5"]
 [ext_resource type="Texture2D" uid="uid://hy8fh0wp842q" path="res://assets/characters/player/placeholder/dash.png" id="1_qd3e3"]
@@ -13,6 +13,7 @@
 [ext_resource type="Script" uid="uid://bnd3sphbyc8sx" path="res://scripts/characters/player/states/JumpState.cs" id="10_3xnwo"]
 [ext_resource type="Script" uid="uid://djta7clexv31v" path="res://scripts/characters/player/states/DashAttackState.cs" id="11_djydg"]
 [ext_resource type="Script" uid="uid://7j8udyol12xg" path="res://scripts/characters/player/states/SlideState.cs" id="12_bsn6e"]
+[ext_resource type="Script" uid="uid://cxmmmus5k4htv" path="res://scripts/characters/player/states/HitState.cs" id="14_hv5x3"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_3xnwo"]
 animations = [{
@@ -30,6 +31,14 @@ animations = [{
 }],
 "loop": true,
 "name": &"fall",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_qd3e3")
+}],
+"loop": true,
+"name": &"hit",
 "speed": 5.0
 }, {
 "frames": [{
@@ -85,6 +94,8 @@ collision_layer = 2
 collision_mask = 17
 platform_floor_layers = 4294967041
 script = ExtResource("1_6avc5")
+DashSpeed = 500.0
+DashDuration = 0.6
 AnimatedSprite = NodePath("AnimatedSprite2D")
 DashHitbox = NodePath("DashHitbox")
 SlideHitbox = NodePath("SlideHitbox")
@@ -92,7 +103,7 @@ HurtboxCollision = NodePath("Hurtbox/CollisionShape2D")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_3xnwo")
-animation = &"fall"
+animation = &"hit"
 autoplay = "idle"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
@@ -147,3 +158,6 @@ script = ExtResource("11_djydg")
 
 [node name="SlideState" type="Node" parent="StateMachine"]
 script = ExtResource("12_bsn6e")
+
+[node name="HitState" type="Node" parent="StateMachine"]
+script = ExtResource("14_hv5x3")
